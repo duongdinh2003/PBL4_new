@@ -23,11 +23,12 @@ import pieceServer.Rook;
 
 
 public class ChessServer2 {
-	ArrayList<Piece> pieceList = new ArrayList<>();
 	List<MoveHistory> moveHistory = new ArrayList<MoveHistory>();
 	Vector<ClientProcessing2> playerList = new Vector<ClientProcessing2>();
-	public String listMoves = ""; // for chess engine
 	ServerSocket server;
+	
+
+
 //	public static void main(String[] args) throws Exception{
 //		new ChessServer2();
 //	}
@@ -36,7 +37,6 @@ public class ChessServer2 {
 	}
 	//
 	public void startServer() {
-		addPieces();
 		try {
 			server = new ServerSocket(6666);
 			System.out.println("Server 2 is running on port 6666");
@@ -46,25 +46,21 @@ public class ChessServer2 {
 					ClientProcessing2 t = new ClientProcessing2(soc, this);
 					playerList.add(t);
 					t.start();
+					setColorAIMode(soc);
 					GUI_Server.serverManagerForm.updateServer2(getClientsAddress());
-					if (playerList.size() == 1) { 
-						setColorAIMode();
-						break;
-					} 
-//					if (playerList.size() == 2) { 
-//						setColorPlayer();
+//					if (playerList.size() == 1) { 
+//						setColorAIMode();
 //						break;
 //					} 
 				} catch (Exception e1) {
-					System.out.println(e1.getMessage());
+					System.out.println("Line 56" + e1.getMessage());
 				}
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Line 60" + e.getMessage());
 		}
 	}
-	//
-	//
+
 	public void stopServer() { // stop accept connections
 		try {
 			server.close();
@@ -114,73 +110,23 @@ public class ChessServer2 {
 		}
 	}
 	//
-	public void setColorPlayer() {
+//	public void setColorPlayer() {
+//		try {
+//			DataOutputStream dos = new DataOutputStream(this.playerList.get(0).soc.getOutputStream());
+//			dos.writeUTF("You are white player");
+//			DataOutputStream dos2 = new DataOutputStream(this.playerList.get(1).soc.getOutputStream());
+//			dos2.writeUTF("You are black player");
+//		} catch (Exception e) {
+//			
+//		}
+//	}
+	public void setColorAIMode(Socket soc) {
 		try {
-			DataOutputStream dos = new DataOutputStream(this.playerList.get(0).soc.getOutputStream());
+			DataOutputStream dos = new DataOutputStream(soc.getOutputStream());
 			dos.writeUTF("You are white player");
-			DataOutputStream dos2 = new DataOutputStream(this.playerList.get(1).soc.getOutputStream());
-			dos2.writeUTF("You are black player");
 		} catch (Exception e) {
 			
 		}
-	}
-	public void setColorAIMode() {
-		try {
-			DataOutputStream dos = new DataOutputStream(this.playerList.get(0).soc.getOutputStream());
-			dos.writeUTF("You are white player");
-		} catch (Exception e) {
-			
-		}
-	}
-	
-	public void addPieces() {
-//		Black
-		pieceList.add(new Rook(0, 0, false));
-		pieceList.add(new Knight(1, 0, false));
-		pieceList.add(new Bishop(2, 0, false));
-		pieceList.add(new Queen(3, 0, false));
-		pieceList.add(new King(4, 0, false));
-		pieceList.add(new Bishop(5, 0, false));
-		pieceList.add(new Knight(6, 0, false));
-		pieceList.add(new Rook(7, 0, false));
-		
-		pieceList.add(new Pawn(0, 1, false));
-		pieceList.add(new Pawn(1, 1, false));
-		pieceList.add(new Pawn(2, 1, false));
-		pieceList.add(new Pawn(3, 1, false));
-		pieceList.add(new Pawn(4, 1, false));
-		pieceList.add(new Pawn(5, 1, false));
-		pieceList.add(new Pawn(6, 1, false));
-		pieceList.add(new Pawn(7, 1, false));
-		
-//		White
-		pieceList.add(new Rook(0, 7, true));
-		pieceList.add(new Knight(1, 7, true));
-		pieceList.add(new Bishop(2, 7, true));
-		pieceList.add(new Queen(3, 7, true));
-		pieceList.add(new King(4, 7, true));
-		pieceList.add(new Bishop(5, 7, true));
-		pieceList.add(new Knight(6, 7, true));
-		pieceList.add(new Rook(7, 7, true));
-		
-		pieceList.add(new Pawn(0, 6, true));
-		pieceList.add(new Pawn(1, 6, true));
-		pieceList.add(new Pawn(2, 6, true));
-		pieceList.add(new Pawn(3, 6, true));
-		pieceList.add(new Pawn(4, 6, true));
-		pieceList.add(new Pawn(5, 6, true));
-		pieceList.add(new Pawn(6, 6, true));
-		pieceList.add(new Pawn(7, 6, true));
-
-	}
-	
-	public Piece getPiece(int col, int row) {
-		for (Piece piece: pieceList) {
-			if(piece.col == col && piece.row == row) {
-				return piece;
-			}
-		}
-		return null;
 	}
 	
 	private void removeAllClient() {
@@ -267,7 +213,7 @@ public class ChessServer2 {
 	}
 	// end standardize functions
 	// chess engine
-	public int[] chessEngine() {
+	public int[] chessEngine(String listMoves) {
 		// AI
 		String stockfishPath = "D:/JDBC/chessEngine/stockfish-windows-x86-64-modern/stockfish/stockfish-windows-x86-64-modern.exe";
 		try {
@@ -328,9 +274,13 @@ class ClientProcessing2 extends Thread {
 	Socket soc;
 	ChessServer2 server;
 	
+	ArrayList<Piece> pieceList = new ArrayList<>();
+	public String listMoves = ""; // for chess engine
+	
 	public ClientProcessing2(Socket soc, ChessServer2 server) {
 		this.soc = soc;
 		this.server = server;
+		addPieces();
 	}
 	public void run() {
 		while(true) {
@@ -344,7 +294,7 @@ class ClientProcessing2 extends Thread {
 				// Kiểm tra đủ 2 người hay chưa
 //				if (server.playerList.size() < 2)
 //					continue;
-				Piece tempPiece = server.getPiece(col, row);
+				Piece tempPiece = this.getPiece(col, row);
 				if (tempPiece == null) {
 					System.out.println("tempPiece null");
 					continue;
@@ -354,26 +304,25 @@ class ClientProcessing2 extends Thread {
 
 				// Kiểm tra lượt đánh của từng người có hợp lệ hay không
 				boolean ok = true;
-				
-//				if ((this == server.playerList.get(0) && server.moveHistory.size() % 2 == 0 && tempPiece.isWhite)
-//						|| (this == server.playerList.get(1) && server.moveHistory.size() % 2 != 0 && !tempPiece.isWhite))
-//				{
-//					ok = true;
-//				}
-//				else {
-//					ok = false;
-//				}
 				if (ok) {
-//					server.moveHistory.add(new MoveHistory(col, row, newCol, newRow));
-					server.listMoves += " " + server.convertStandardMove(col, row, newCol, newRow);
-					if(server.getPiece(newCol, newRow) != null) {
-						server.getPiece(newCol, newRow).isWhite = tempPiece.isWhite;
-//						tempPiece.isWhite = server.getPiece(newCol, newRow).isWhite;
+					this.listMoves += " " + server.convertStandardMove(col, row, newCol, newRow);
+					if(this.getPiece(newCol, newRow) != null) {
+						this.getPiece(newCol, newRow).isWhite = tempPiece.isWhite;
 					}
 					tempPiece.col = newCol;
 					tempPiece.row = newRow;
 					
+					if (tempPiece.name.equals("King") && Math.abs(newCol - col) == 2) {
+						Piece rook;
 
+						if (col < newCol) {
+							rook = this.getPiece(7, row);
+							rook.col = 5;
+						} else {
+							rook = this.getPiece(0, row);
+							rook.col = 3;
+						}
+					}
 
 					try {
 						DataOutputStream dos = new DataOutputStream(server.playerList.get(0).soc.getOutputStream());
@@ -385,12 +334,12 @@ class ClientProcessing2 extends Thread {
 					} catch (Exception e) {
 
 					}
-					int[] movesFromAI = server.chessEngine();
+					int[] movesFromAI = server.chessEngine(listMoves);
 					int col2 = movesFromAI[0];
 					int row2 = movesFromAI[1];
 					int newCol2 = movesFromAI[2];
 					int newRow2 = movesFromAI[3];
-					server.listMoves += " " + server.convertStandardMove(col2, row2, newCol2, newRow2);
+					this.listMoves += " " + server.convertStandardMove(col2, row2, newCol2, newRow2);
 					try {
 						DataOutputStream dos = new DataOutputStream(server.playerList.get(0).soc.getOutputStream());
 						dos.writeUTF(col2 + "");
@@ -400,6 +349,22 @@ class ClientProcessing2 extends Thread {
 						System.out.println("Da gui: " + col + "," + row + "," + newCol + "," + newRow);
 					} catch (Exception e) {
 
+					}
+					Piece tempPiece2 = this.getPiece(col2, row2);
+					if(this.getPiece(newCol2, newRow2) != null) {
+						this.getPiece(newCol2, newRow2).isWhite = tempPiece2.isWhite;
+					}
+					tempPiece2.col = newCol2;
+					tempPiece2.row = newRow2;
+					if (tempPiece2.name.equals("King") && Math.abs(newCol2 - col2) == 2) {
+						Piece rook2;
+						if (col2 < newCol2) {
+							rook2 = this.getPiece(7, row2);
+							rook2.col = 5;
+						} else {
+							rook2 = this.getPiece(0, row2);
+							rook2.col = 3;
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -411,6 +376,56 @@ class ClientProcessing2 extends Thread {
 				break;
 			}
 		}
+	}
+	
+	public void addPieces() {
+//		Black
+		pieceList.add(new Rook(0, 0, false));
+		pieceList.add(new Knight(1, 0, false));
+		pieceList.add(new Bishop(2, 0, false));
+		pieceList.add(new Queen(3, 0, false));
+		pieceList.add(new King(4, 0, false));
+		pieceList.add(new Bishop(5, 0, false));
+		pieceList.add(new Knight(6, 0, false));
+		pieceList.add(new Rook(7, 0, false));
+		
+		pieceList.add(new Pawn(0, 1, false));
+		pieceList.add(new Pawn(1, 1, false));
+		pieceList.add(new Pawn(2, 1, false));
+		pieceList.add(new Pawn(3, 1, false));
+		pieceList.add(new Pawn(4, 1, false));
+		pieceList.add(new Pawn(5, 1, false));
+		pieceList.add(new Pawn(6, 1, false));
+		pieceList.add(new Pawn(7, 1, false));
+		
+//		White
+		pieceList.add(new Rook(0, 7, true));
+		pieceList.add(new Knight(1, 7, true));
+		pieceList.add(new Bishop(2, 7, true));
+		pieceList.add(new Queen(3, 7, true));
+		pieceList.add(new King(4, 7, true));
+		pieceList.add(new Bishop(5, 7, true));
+		pieceList.add(new Knight(6, 7, true));
+		pieceList.add(new Rook(7, 7, true));
+		
+		pieceList.add(new Pawn(0, 6, true));
+		pieceList.add(new Pawn(1, 6, true));
+		pieceList.add(new Pawn(2, 6, true));
+		pieceList.add(new Pawn(3, 6, true));
+		pieceList.add(new Pawn(4, 6, true));
+		pieceList.add(new Pawn(5, 6, true));
+		pieceList.add(new Pawn(6, 6, true));
+		pieceList.add(new Pawn(7, 6, true));
+
+	}
+	
+	public Piece getPiece(int col, int row) {
+		for (Piece piece: pieceList) {
+			if(piece.col == col && piece.row == row) {
+				return piece;
+			}
+		}
+		return null;
 	}
 	
 }

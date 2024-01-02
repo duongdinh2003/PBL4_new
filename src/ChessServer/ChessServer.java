@@ -371,7 +371,19 @@ class ClientProcessing extends Thread {
 						}
 						tempPiece.col = newCol;
 						tempPiece.row = newRow;
+						// castling
+						if (tempPiece.name.equals("King") && Math.abs(newCol - col) == 2) {
+							Piece rook;
 
+							if (col < newCol) {
+								rook = match.getPiece(7, row);
+								rook.col = 5;
+							} else {
+								rook = match.getPiece(0, row);
+								rook.col = 3;
+							}
+						}
+						//
 						for (int i = 0; i < match.playerVector.size(); i++) {
 							try {
 								DataOutputStream dos = new DataOutputStream(

@@ -148,8 +148,8 @@ class ClientRequestDB extends Thread {
 		return false;
 	}
 	
-	private List<String> getRoomList() {
-		List<String> list = new ArrayList<String>();
+	private ArrayList<String> getRoomList() {
+		ArrayList<String> list = new ArrayList<String>();
 		Connection connection = DataBaseManager.openConnection();
 		try {
 			Statement stm = connection.createStatement();
