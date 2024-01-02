@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class matchFeaturesPanel extends JPanel {
-	private JTextField textField;
+	JTextField textField;
 	private JTextArea textArea;
 	private JTextArea textArea_1;
 	JButton btnNewButton;
@@ -42,14 +42,16 @@ public class matchFeaturesPanel extends JPanel {
 		textField.setColumns(10);
 		
 		btnNewButton = new JButton("Send");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				PlayerSession playerSession = PlayerSession.getExistedInstance();
-				System.out.println("Client: "+playerSession.idPlayer);
+//		btnNewButton.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				PlayerSession playerSession = PlayerSession.getExistedInstance();
+//				System.out.println("Client: "+playerSession.idPlayer);
 				
-				
-			}
-		});
+//				String message = textField.getText();
+//				updateMessage(message);
+//				textField.setText("");
+//			}
+//		});
 		btnNewButton.setFont(new Font("Arial", Font.BOLD, 15));
 		btnNewButton.setBounds(479, 646, 85, 32);
 		add(btnNewButton);

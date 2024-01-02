@@ -76,6 +76,18 @@ public class inMatchWithPlayer extends JFrame {
 		// Chat
 		matchFeaturesPanel = new matchFeaturesPanel();
 		matchFeaturesPanel.setBounds(906, 92, 600, 700);
+		
+		matchFeaturesPanel.btnNewButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String message = matchFeaturesPanel.textField.getText();
+				PlayerSession playerSession = PlayerSession.getExistedInstance();
+				
+				String namePlayer = playerSession.getNamePlayer(playerSession.idPlayer);
+				board.sendMessage(namePlayer+": "+message);
+				matchFeaturesPanel.textField.setText("");
+			}
+		});
 		contentPane.add(matchFeaturesPanel);
 		
 		panelDraw = new JPanel();

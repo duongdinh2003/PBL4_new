@@ -257,8 +257,21 @@ class ClientRequestDB extends Thread {
 		}
 	}
 	
-	private void sendMessageToPlayer() {
-		
+	private String getNamePlayer(String idPlayer) {
+		Connection connection = DataBaseManager.openConnection();
+		String name = "";
+		try {
+			Statement stm = connection.createStatement();
+			String query = "select Name_Player from Player where username = '"+idPlayer+"'";
+			ResultSet rs = stm.executeQuery(query);
+			if (rs.next()) {
+				name = rs.getString("Name_Player");
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage()+"\tLoi khong lay duoc ten nguoi choi line 272");
+		}
+		return name;
 	}
 	
 	public void run() {
@@ -314,6 +327,12 @@ class ClientRequestDB extends Thread {
 					int idRoom = Integer.parseInt(dis.readUTF());
 					setStatusRoom(idRoom);
 					dos.writeUTF("Kick-Off");
+					continue;
+				}
+				if (msg.equals("Get Name Player")) {
+					String idPlayer = dis.readUTF();
+					String name = getNamePlayer(idPlayer);
+					dos.writeUTF(name);
 					continue;
 				}
 			} catch (Exception e) {

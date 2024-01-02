@@ -327,6 +327,21 @@ class ClientProcessing extends Thread {
 						}
 						
 					}
+					
+					// Xu Ly tin nhan tu client gui len
+					if (col == -8880) {
+						String message = dis.readUTF();
+						System.out.println("Tin nhan: "+message);
+						for (int i=0; i<match.playerVector.size(); i++) {
+							DataOutputStream dos = new DataOutputStream(match.playerVector.get(i).soc.getOutputStream());
+							dos.writeUTF("-8880");
+							dos.writeUTF("-8880");
+							dos.writeUTF("-8880");
+							dos.writeUTF("-8880");
+							dos.writeUTF(message);
+						}
+						continue;
+					}
 
 					Piece tempPiece = match.getPiece(col, row);
 					if (tempPiece == null) {

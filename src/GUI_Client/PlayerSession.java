@@ -185,6 +185,23 @@ public class PlayerSession {
 		}
 	}
 	
+	public String getNamePlayer(String idPlayer) {
+		try {
+			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+			dos.writeUTF("Get Name Player");
+			dos.writeUTF(idPlayer);
+			
+			DataInputStream dis = new DataInputStream(socket.getInputStream());
+			String name = dis.readUTF();
+			
+			return name;
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage()+"\tLine 200 Khong nhan duoc ten");
+		}
+		return null;
+	}
+	
 	public void closeSession() {
 		try {
 			socket.close();

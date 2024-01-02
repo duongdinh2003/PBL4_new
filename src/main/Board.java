@@ -758,6 +758,11 @@ public class Board extends JPanel implements MouseListener,MouseMotionListener,R
 					JOptionPane.showMessageDialog(parentJFrame, "The opponent accepted to Match Draw!");
 					this.parentJFrame.quitMatch(this.parentJFrame.idRoom);
 				}
+				if (col == -8880) {
+					String message = dis.readUTF();
+					this.parentJFrame.updateMessage(message);
+					continue;
+				}
 				System.out.println("Client get: " + col + "," + row + "," + newCol + "," + newRow);
 				String colPos = convertColumnPos(col);
 				String newColPos = convertColumnPos(newCol);
@@ -822,6 +827,21 @@ public class Board extends JPanel implements MouseListener,MouseMotionListener,R
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage() + "\tKhong the nhan yeu cau xin hoa");
+		}
+	}
+	
+	public void sendMessage(String message) {
+		try {
+			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+			
+			dos.writeUTF("-8880");
+			dos.writeUTF("-8880");
+			dos.writeUTF("-8880");
+			dos.writeUTF("-8880");
+			dos.writeUTF(message);
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage() + "\tKhong the gui tin nhan cho doi phuong Loi 843");
 		}
 	}
 	
